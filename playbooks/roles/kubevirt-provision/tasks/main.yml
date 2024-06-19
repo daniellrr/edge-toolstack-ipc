@@ -1,0 +1,41 @@
+---
+
+- name: Get latest KubeVirt version
+  shell: curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt
+  register: kubevirt_version
+
+- name: Print KubeVirt version
+  debug:
+    msg: "KubeVirt version: {{ kubevirt_version.stdout }}"
+
+- name: Install KubeVirt operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', 'https://github.com/kubevirt/kubevirt/releases/download/' + kubevirt_version.stdout + '/kubevirt-operator.yaml') }}"
+
+- name: Install KubeVirt custom resource
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', 'https://github.com/kubevirt/kubevirt/releases/download/' + kubevirt_version.stdout + '/kubevirt-cr.yaml') }}"
+
+- name: Get latest CDI version tag URL
+  shell: curl -s -w %{redirect_url} https://github.com/kubevirt/containerized-data-importer/releases/latest
+  register: cdi_tag_url
+
+- name: Extract CDI version from tag URL
+  set_fact:
+    cdi_version: "{{ cdi_tag_url.stdout | regex_search('/v[0-9.]+$') | regex_replace('/v', '') }}"
+
+- name: Print CDI version
+  debug:
+    msg: "CDI version: {{ cdi_version }}"
+
+- name: Install CDI operator
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', 'https://github.com/kubevirt/containerized-data-importer/releases/download/v' + cdi_version + '/cdi-operator.yaml') }}"
+
+- name: Install CDI custom resource
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('url', 'https://github.com/kubevirt/containerized-data-importer/releases/download/v' + cdi_version + '/cdi-cr.yaml') }}"

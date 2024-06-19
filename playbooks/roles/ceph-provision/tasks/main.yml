@@ -1,0 +1,5 @@
+helm repo add rook-release https://charts.rook.io/release
+---
+- name: Get latest KubeVirt version
+  shell: curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt
+  register: kubevirt_version

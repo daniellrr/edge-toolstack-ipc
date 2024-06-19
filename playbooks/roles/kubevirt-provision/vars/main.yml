@@ -1,0 +1,2 @@
+---
+config_dir: "{{ role_path }}/../../../talos_output"
