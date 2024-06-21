@@ -1,11 +1,12 @@
 ---
 
 cluster_name: "edgek8s"
-talos_version: "v1.4.1"
+talos_version: "v1.7.4"
 
-controlplane_ips: ["192.168.1.109"]
+controlplane_ips: ["10.72.72.10"]
 
-install_disk: "/dev/sda"
+#install_disk: "/dev/sda"
+install_disk: "/dev/nvme0n1"
 
 talosctl_download_url: "https://github.com/siderolabs/talos/releases/download/{{ talos_version }}/talosctl-linux-amd64"
 

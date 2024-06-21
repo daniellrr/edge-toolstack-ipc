@@ -8,15 +8,29 @@
   debug:
     msg: "KubeVirt version: {{ kubevirt_version.stdout }}"
 
+- name: Download KubeVirt operator YAML
+  get_url:
+    url: "https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version.stdout }}/kubevirt-operator.yaml"
+    dest: "{{ role_path }}/manifests/kubevirt-operator.yaml"
+
+- name: Download KubeVirt custom resource YAML
+  get_url:
+    url: "https://github.com/kubevirt/kubevirt/releases/download/{{ kubevirt_version.stdout }}/kubevirt-cr.yaml"
+    dest: "{{ role_path }}/manifests/kubevirt-cr.yaml"
+
 - name: Install KubeVirt operator
   kubernetes.core.k8s:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
     state: present
-    definition: "{{ lookup('url', 'https://github.com/kubevirt/kubevirt/releases/download/' + kubevirt_version.stdout + '/kubevirt-operator.yaml') }}"
+    src: "{{ role_path }}/manifests/kubevirt-operator.yaml"
+    wait: true
 
 - name: Install KubeVirt custom resource
   kubernetes.core.k8s:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
     state: present
-    definition: "{{ lookup('url', 'https://github.com/kubevirt/kubevirt/releases/download/' + kubevirt_version.stdout + '/kubevirt-cr.yaml') }}"
+    src: "{{ role_path }}/manifests/kubevirt-cr.yaml"
+    wait: true
 
 - name: Get latest CDI version tag URL
   shell: curl -s -w %{redirect_url} https://github.com/kubevirt/containerized-data-importer/releases/latest
@@ -30,12 +44,26 @@
   debug:
     msg: "CDI version: {{ cdi_version }}"
 
+- name: Download CDI operator YAML
+  get_url:
+    url: "https://github.com/kubevirt/containerized-data-importer/releases/download/v{{ cdi_version }}/cdi-operator.yaml"
+    dest: "{{ role_path }}/manifests/cdi-operator.yaml"
+
+- name: Download CDI custom resource YAML
+  get_url:
+    url: "https://github.com/kubevirt/containerized-data-importer/releases/download/v{{ cdi_version }}/cdi-cr.yaml"
+    dest: "{{ role_path }}/manifests/cdi-cr.yaml"
+
 - name: Install CDI operator
   kubernetes.core.k8s:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
     state: present
-    definition: "{{ lookup('url', 'https://github.com/kubevirt/containerized-data-importer/releases/download/v' + cdi_version + '/cdi-operator.yaml') }}"
+    src: "{{ role_path }}/manifests/cdi-operator.yaml"
+    wait: true
 
 - name: Install CDI custom resource
   kubernetes.core.k8s:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
     state: present
-    definition: "{{ lookup('url', 'https://github.com/kubevirt/containerized-data-importer/releases/download/v' + cdi_version + '/cdi-cr.yaml') }}"
+    src: "{{ role_path }}/manifests/cdi-cr.yaml"
+    wait: true

@@ -1,0 +1,20 @@
+cephClusterSpec:
+  mon:
+    count: 1
+
+  storage:
+    useAllNodes: true
+    useAllDevices: false
+    devices:
+      - name: /dev/sdb
+
+blockPools:
+  - name: ceph-blockpool
+    spec:
+      replicated:
+        size: 1
+
+toolbox:
+  enabled: true
+
+operatorNamespace: rook-ceph

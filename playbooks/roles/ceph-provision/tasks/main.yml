@@ -1,5 +1,37 @@
-helm repo add rook-release https://charts.rook.io/release
 ---
-- name: Get latest KubeVirt version
-  shell: curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt
-  register: kubevirt_version
+
+- name: Add ceph-Rook Helm repository
+  kubernetes.core.helm_repository:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
+    name: rook-release
+    repo_url: https://charts.rook.io/release
+    state: present
+
+- name: Install Rook Ceph chart
+  kubernetes.core.helm:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
+    name: rook-ceph
+    chart_ref: rook-release/rook-ceph
+    create_namespace: true
+    namespace: rook-ceph
+    state: present
+    wait: true
+
+- name: Add Rook Helm repository
+  kubernetes.core.helm_repository:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
+    name: rook-release
+    repo_url: https://charts.rook.io/release
+    state: present
+
+- name: Install Rook Ceph Cluster chart
+  kubernetes.core.helm:
+    kubeconfig: "{{ config_dir }}/kubeconfig"
+    name: rook-ceph-cluster
+    chart_ref: rook-release/rook-ceph-cluster
+    create_namespace: true
+    namespace: rook-ceph
+    values_files:
+      - "{{ role_path }}/templates/rook-ceph-cluster-values.yml"
+    state: present
+    wait: true
